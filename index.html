@@ -164,6 +164,8 @@
   }
 
   .pool-amount {
+    position: relative;
+    display: inline-block;
     font-family: 'Newsreader', 'Times New Roman', serif;
     font-size: clamp(72px, 14vw, 184px);
     font-weight: 500;
@@ -172,12 +174,12 @@
     color: var(--fg);
     margin-bottom: 26px;
     font-variant-numeric: tabular-nums;
-    transition: transform 0.18s ease-out;
+    transition: transform 0.4s ease-out;
     text-shadow: 0 0 60px rgba(245, 244, 239, 0.04);
   }
 
   .pool-amount.flicker {
-    transform: scale(1.005);
+    transform: scale(1.003);
   }
 
   .pool-amount .currency {
@@ -186,6 +188,29 @@
     margin-right: 2px;
     color: var(--fg-dim);
     font-weight: 400;
+  }
+
+  .delta-flash {
+    position: absolute;
+    top: 4%;
+    right: -8px;
+    transform: translateX(100%);
+    font-family: 'Inter', sans-serif;
+    font-size: 0.14em;
+    font-weight: 500;
+    color: var(--accent);
+    letter-spacing: 0.02em;
+    opacity: 0;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+  .delta-flash.show {
+    animation: delta-pop 1.4s ease-out;
+  }
+  @keyframes delta-pop {
+    0%   { opacity: 0; transform: translate(100%, 12px); }
+    18%  { opacity: 1; transform: translate(100%, -2px); }
+    100% { opacity: 0; transform: translate(110%, -42px); }
   }
 
   .spent-line {
@@ -282,13 +307,14 @@
         <path d="M12 0 L13.8 9.4 L22 4.4 L17 12.6 L24 14.4 L14.6 16.2 L19.6 24 L12 19 L4.4 24 L9.4 16.2 L0 14.4 L7 12.6 L2 4.4 L10.2 9.4 Z"/>
       </svg>
       <div class="label">
-        Global Credit Pool<span class="sep">&middot;</span>Remaining
+        Global Usage<span class="sep">&middot;</span>Today
       </div>
       <div class="pool-amount" id="poolAmount">
         <span class="currency">$</span><span id="poolValue">58,793</span>
+        <span class="delta-flash" id="deltaFlash"></span>
       </div>
       <div class="spent-line">
-        <span class="amount" id="spentValue">$0.00</span> spent across the network today
+        Burning <span class="amount" id="spentValue">$0.00</span>/min across the network
         <span class="live">Live</span>
       </div>
     </div>
@@ -315,14 +341,16 @@
 
 <script>
   // FAKE COUNTER ENGINE
-  // Pool starts near screenshot value and decreases ("spent" rises symmetrically).
-  // Updates: small frequent decrements + occasional larger jumps to feel alive.
+  // Counter rises ("today's global usage"), with realistic non-uniform cadence:
+  //   long pauses, slow flow, normal flow, occasional rapid bursts,
+  //   and rare "mega transactions" - so it never feels like a metronome.
 
   const state = {
-    pool: 58793.42,
-    spentToday: 0,
+    total: 58793.42,
     sessions: 142,
     sessionsLast: 142,
+    lastDelta: 0,
+    burnPerMin: 0,
   };
 
   const el = {
@@ -333,6 +361,7 @@
     sessions: document.getElementById('sessions'),
     sessionsDelta: document.getElementById('sessionsDelta'),
     tpm: document.getElementById('tpm'),
+    deltaFlash: document.getElementById('deltaFlash'),
   };
 
   function fmt(n, decimals) {
@@ -346,47 +375,74 @@
     return Math.random() * (max - min) + min;
   }
 
-  // BURN RATE TARGET: ~$1-3 per second average, with bursts up to $20
-  let burnPerSec = 1.8;
-  let burstCooldown = 0;
+  // INTERVAL DISTRIBUTION (ms between updates):
+  //   5%  long pause (3.2-6.0s) - quiet moment, no traffic
+  //   25% slow flow  (1.2-2.4s)
+  //   35% medium     (0.6-1.3s)
+  //   25% normal     (0.3-0.7s)
+  //   10% quick      (0.14-0.32s)
+  function nextInterval() {
+    const r = Math.random();
+    if (r < 0.05) return rand(3200, 6000);
+    if (r < 0.30) return rand(1200, 2400);
+    if (r < 0.65) return rand(600, 1300);
+    if (r < 0.90) return rand(300, 700);
+    return rand(140, 320);
+  }
 
-  function tick(dt) {
-    // dt in seconds
-    if (burstCooldown > 0) {
-      burstCooldown -= dt;
-    } else if (Math.random() < 0.04) {
-      // ~4% chance per tick to start a burst (large transaction)
-      burnPerSec = rand(8, 22);
-      burstCooldown = rand(0.8, 2.4);
-    } else {
-      // gentle drift
-      burnPerSec += rand(-0.4, 0.4);
-      burnPerSec = Math.max(0.4, Math.min(burnPerSec, 6));
+  // DELTA SIZE DISTRIBUTION ($ per update):
+  //   1%  massive    ($220-680)  - large enterprise transaction
+  //   5%  big        ($60-180)
+  //   20% medium     ($8-40)
+  //   55% normal     ($1.40-8.00)
+  //   19% small      ($0.20-1.40)
+  function nextDelta() {
+    const r = Math.random();
+    if (r < 0.01) return rand(220, 680);
+    if (r < 0.06) return rand(60, 180);
+    if (r < 0.26) return rand(8, 40);
+    if (r < 0.81) return rand(1.40, 8.00);
+    return rand(0.20, 1.40);
+  }
+
+  // BURST: occasionally fire 2-4 quick updates in 100-280ms each
+  let burstQueue = 0;
+  let recentDeltas = []; // last 60s for burn-per-min display
+
+  function tick() {
+    if (burstQueue === 0 && Math.random() < 0.05) {
+      burstQueue = Math.floor(rand(2, 5)); // 2-4
     }
 
-    const delta = burnPerSec * dt;
-    state.pool -= delta;
-    state.spentToday += delta;
+    const inBurst = burstQueue > 0;
+    if (inBurst) burstQueue--;
 
-    // sessions drift
-    if (Math.random() < 0.18) {
-      const change = Math.round(rand(-3, 6));
+    // burst deltas are smaller (rapid micro-charges) so visual jumps make sense
+    const delta = nextDelta() * (inBurst ? 0.55 : 1);
+    state.total += delta;
+    state.lastDelta = delta;
+
+    // burn-per-min: sum of last 60s of deltas
+    const now = performance.now();
+    recentDeltas.push({ t: now, v: delta });
+    recentDeltas = recentDeltas.filter(d => now - d.t < 60000);
+    state.burnPerMin = recentDeltas.reduce((s, d) => s + d.v, 0);
+
+    // sessions drift occasionally
+    if (Math.random() < 0.10) {
+      const change = Math.round(rand(-2, 5));
       state.sessions = Math.max(80, state.sessions + change);
     }
 
-    // floor: don't drop below 0
-    if (state.pool < 0) state.pool = 0;
+    return inBurst;
   }
 
   function render() {
-    // pool: integer display when >= 100, else 2 decimals (matches screenshot style)
-    const poolStr = state.pool >= 1000
-      ? Math.round(state.pool).toLocaleString('en-US')
-      : fmt(state.pool, 2);
-    el.poolValue.textContent = poolStr;
+    // integer display - matches screenshot aesthetic
+    el.poolValue.textContent = Math.round(state.total).toLocaleString('en-US');
 
-    el.spentValue.textContent = '$' + fmt(state.spentToday, 2);
-    el.burnRate.textContent = '$' + fmt(burnPerSec, 2);
+    el.spentValue.textContent = '$' + fmt(state.burnPerMin, 2);
+    el.burnRate.textContent = '$' + fmt(state.burnPerMin / 60, 2);
 
     el.sessions.textContent = state.sessions.toLocaleString('en-US');
     const sd = state.sessions - state.sessionsLast;
@@ -395,33 +451,34 @@
       el.sessionsDelta.style.color = sd > 0 ? 'var(--accent)' : '#ef4444';
     }
 
-    // tokens per minute synthetic: burnRate * 600-1400
-    el.tpm.textContent = Math.round(burnPerSec * rand(620, 1280)).toLocaleString('en-US');
+    // tokens per min: burn * 180-320 (rough avg cost-per-token bucket)
+    el.tpm.textContent = Math.round(state.burnPerMin * rand(180, 320)).toLocaleString('en-US');
 
-    // micro flicker animation
+    // delta flash - shows the actual increment that just landed
+    if (state.lastDelta > 0) {
+      const decimals = state.lastDelta < 10 ? 2 : 0;
+      el.deltaFlash.textContent = '+$' + fmt(state.lastDelta, decimals);
+      el.deltaFlash.classList.remove('show');
+      void el.deltaFlash.offsetWidth; // force reflow to restart animation
+      el.deltaFlash.classList.add('show');
+    }
+
     el.poolAmount.classList.add('flicker');
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => el.poolAmount.classList.remove('flicker'));
-    });
+    setTimeout(() => el.poolAmount.classList.remove('flicker'), 220);
   }
 
-  // commit sessions baseline every 10s for delta display
   setInterval(() => { state.sessionsLast = state.sessions; }, 10000);
 
-  // initial render
   render();
 
-  let lastT = performance.now();
   function loop() {
-    const now = performance.now();
-    const dt = (now - lastT) / 1000;
-    lastT = now;
-    tick(dt);
+    tick();
     render();
-    // schedule next tick at 80-260ms for "live" feel
-    setTimeout(loop, 80 + Math.random() * 180);
+    // burst sequence: short interval; otherwise weighted distribution
+    const interval = burstQueue > 0 ? rand(110, 260) : nextInterval();
+    setTimeout(loop, interval);
   }
-  setTimeout(loop, 250);
+  setTimeout(loop, 700);
 </script>
 </body>
 </html>
