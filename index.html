@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="cs">
+<html lang="en">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -135,7 +135,6 @@
   }
 
   .pool-amount {
-    position: relative;
     display: inline-block;
     font-family: 'Inter Tight', sans-serif;
     font-size: clamp(72px, 13vw, 176px);
@@ -148,36 +147,15 @@
     transition: transform 0.4s ease-out;
   }
   .pool-amount.flicker { transform: scale(1.002); }
-  .pool-amount .currency-suffix {
-    font-size: 0.32em;
-    margin-left: 0.18em;
+  .pool-amount .currency {
+    font-size: 0.5em;
+    vertical-align: top;
+    margin-right: 4px;
     color: var(--fg-dim);
     font-weight: 500;
-    letter-spacing: -0.01em;
-    vertical-align: 0.6em;
-  }
-
-  .delta-flash {
-    position: absolute;
-    top: 16%;
-    right: -10px;
-    transform: translateX(100%);
-    font-family: 'Inter Tight', sans-serif;
-    font-size: 0.13em;
-    font-weight: 500;
-    color: var(--fg);
-    letter-spacing: 0.04em;
-    opacity: 0;
-    pointer-events: none;
-    white-space: nowrap;
-  }
-  .delta-flash.show {
-    animation: delta-pop 1.4s ease-out;
-  }
-  @keyframes delta-pop {
-    0%   { opacity: 0; transform: translate(100%, 12px); }
-    18%  { opacity: 0.85; transform: translate(100%, -2px); }
-    100% { opacity: 0; transform: translate(110%, -42px); }
+    line-height: 1;
+    position: relative;
+    top: 0.16em;
   }
 
   .spent-line {
@@ -359,11 +337,10 @@
         Global Credit Pool<span class="sep">&middot;</span>Spent Today
       </div>
       <div class="pool-amount" id="poolAmount">
-        <span id="poolValue">723&nbsp;324</span><span class="currency-suffix">Kč</span>
-        <span class="delta-flash" id="deltaFlash"></span>
+        <span class="currency">$</span><span id="poolValue">58,793</span>
       </div>
       <div class="spent-line">
-        Burning <span class="amount" id="spentValue">0 Kč</span>/min across the network
+        Burning <span class="amount" id="spentValue">$0.00</span>/min across the network
         <span class="live">Live</span>
       </div>
 
@@ -386,10 +363,10 @@
             <span class="meta">Claude Sonnet / Opus</span>
           </div>
           <div class="provider-share">
-            <span class="share-pct">0,0&nbsp;%</span>
+            <span class="share-pct">0.0%</span>
             <span class="provider-bar"><span class="bar-fill"></span></span>
           </div>
-          <div class="provider-spend">0&nbsp;Kč</div>
+          <div class="provider-spend">$0</div>
         </div>
 
         <div class="provider" data-id="openai">
@@ -405,10 +382,10 @@
             <span class="meta">GPT-5 / Codex</span>
           </div>
           <div class="provider-share">
-            <span class="share-pct">0,0&nbsp;%</span>
+            <span class="share-pct">0.0%</span>
             <span class="provider-bar"><span class="bar-fill"></span></span>
           </div>
-          <div class="provider-spend">0&nbsp;Kč</div>
+          <div class="provider-spend">$0</div>
         </div>
 
         <div class="provider" data-id="openrouter">
@@ -426,10 +403,10 @@
             <span class="meta">Multi-model gateway</span>
           </div>
           <div class="provider-share">
-            <span class="share-pct">0,0&nbsp;%</span>
+            <span class="share-pct">0.0%</span>
             <span class="provider-bar"><span class="bar-fill"></span></span>
           </div>
-          <div class="provider-spend">0&nbsp;Kč</div>
+          <div class="provider-spend">$0</div>
         </div>
 
         <div class="provider" data-id="google">
@@ -443,10 +420,10 @@
             <span class="meta">Gemini 2.5 Pro</span>
           </div>
           <div class="provider-share">
-            <span class="share-pct">0,0&nbsp;%</span>
+            <span class="share-pct">0.0%</span>
             <span class="provider-bar"><span class="bar-fill"></span></span>
           </div>
-          <div class="provider-spend">0&nbsp;Kč</div>
+          <div class="provider-spend">$0</div>
         </div>
 
         <div class="provider" data-id="xai">
@@ -460,10 +437,10 @@
             <span class="meta">Grok 4</span>
           </div>
           <div class="provider-share">
-            <span class="share-pct">0,0&nbsp;%</span>
+            <span class="share-pct">0.0%</span>
             <span class="provider-bar"><span class="bar-fill"></span></span>
           </div>
-          <div class="provider-spend">0&nbsp;Kč</div>
+          <div class="provider-spend">$0</div>
         </div>
 
         <div class="provider" data-id="deepseek">
@@ -478,10 +455,10 @@
             <span class="meta">V3.2</span>
           </div>
           <div class="provider-share">
-            <span class="share-pct">0,0&nbsp;%</span>
+            <span class="share-pct">0.0%</span>
             <span class="provider-bar"><span class="bar-fill"></span></span>
           </div>
-          <div class="provider-spend">0&nbsp;Kč</div>
+          <div class="provider-spend">$0</div>
         </div>
 
         <div class="provider" data-id="mistral">
@@ -497,10 +474,10 @@
             <span class="meta">Large 3</span>
           </div>
           <div class="provider-share">
-            <span class="share-pct">0,0&nbsp;%</span>
+            <span class="share-pct">0.0%</span>
             <span class="provider-bar"><span class="bar-fill"></span></span>
           </div>
-          <div class="provider-spend">0&nbsp;Kč</div>
+          <div class="provider-spend">$0</div>
         </div>
       </div>
     </div>
@@ -509,7 +486,7 @@
   <footer>
     <div class="stat">
       <div class="stat-label">Burn Rate</div>
-      <div class="stat-value"><span id="burnRate">0</span><span class="unit">Kč/s</span></div>
+      <div class="stat-value">$<span id="burnRate">0.00</span><span class="unit">/s</span></div>
     </div>
     <div class="stat">
       <div class="stat-label">Tokens / Min</div>
@@ -523,47 +500,45 @@
 
 <script>
   // PROVIDER REGISTRY
-  // weight   = traffic share (% of ticks routed to this provider)
-  // tokKc    = tokens you get per 1 Kč spent (blended input/output, real API pricing tiers)
-  //            Anthropic Sonnet ~$3/$15 per Mtok -> ~5k tok/Kc
-  //            OpenAI GPT-5    ~$3/$15 per Mtok -> ~5k tok/Kc
-  //            OpenRouter      blended           -> ~10k tok/Kc
-  //            Gemini 2.5 Pro  ~$1.25/$5 per Mtok -> ~14k tok/Kc
-  //            Grok 4          ~$3/$15 per Mtok  -> ~5k tok/Kc
-  //            DeepSeek V3.2   ~$0.14/$0.28 Mtok -> ~210k tok/Kc
-  //            Mistral Large 3 ~$2/$6 per Mtok   -> ~10k tok/Kc
+  // weight  = traffic share (% of ticks routed to this provider)
+  // tokUsd  = tokens you get per $1 spent (blended input/output, real API tiers)
+  //   Anthropic Sonnet ~$3/$15 per Mtok    -> ~110k tok/$
+  //   OpenAI GPT-5     ~$3/$15 per Mtok    -> ~110k tok/$
+  //   OpenRouter       blended             -> ~220k tok/$
+  //   Gemini 2.5 Pro   ~$1.25/$5 per Mtok  -> ~320k tok/$
+  //   Grok 4           ~$3/$15 per Mtok    -> ~110k tok/$
+  //   DeepSeek V3.2    ~$0.14/$0.28 per Mtok -> ~4.7M tok/$
+  //   Mistral Large 3  ~$2/$6 per Mtok     -> ~250k tok/$
   const PROVIDERS = [
-    { id: 'anthropic',  name: 'Anthropic',  weight: 32, tokKc:   5000 },
-    { id: 'openai',     name: 'OpenAI',     weight: 26, tokKc:   5000 },
-    { id: 'openrouter', name: 'OpenRouter', weight: 12, tokKc:  10000 },
-    { id: 'google',     name: 'Google',     weight: 10, tokKc:  14000 },
-    { id: 'xai',        name: 'xAI',        weight:  8, tokKc:   5000 },
-    { id: 'deepseek',   name: 'DeepSeek',   weight:  7, tokKc: 210000 },
-    { id: 'mistral',    name: 'Mistral',    weight:  5, tokKc:  10000 },
+    { id: 'anthropic',  name: 'Anthropic',  weight: 32, tokUsd:   110000 },
+    { id: 'openai',     name: 'OpenAI',     weight: 26, tokUsd:   110000 },
+    { id: 'openrouter', name: 'OpenRouter', weight: 12, tokUsd:   220000 },
+    { id: 'google',     name: 'Google',     weight: 10, tokUsd:   320000 },
+    { id: 'xai',        name: 'xAI',        weight:  8, tokUsd:   110000 },
+    { id: 'deepseek',   name: 'DeepSeek',   weight:  7, tokUsd:  4700000 },
+    { id: 'mistral',    name: 'Mistral',    weight:  5, tokUsd:   250000 },
   ];
 
-  const TOTAL_START = 723324;
-  const HARD_CAP    = 999999;
-  const SOFT_CAP_HEADROOM = 60000; // start damping deltas in last 60k Kč
+  const TOTAL_START = 58793;
+  const HARD_CAP    = 99999;
+  const SOFT_CAP_HEADROOM = 5000;
 
   const totalWeight = PROVIDERS.reduce((s, p) => s + p.weight, 0);
   PROVIDERS.forEach(p => { p.share = p.weight / totalWeight; p.spent = TOTAL_START * p.share; });
 
   const state = {
     total: TOTAL_START,
-    lastDelta: 0,
     burnPerSec: 0,
     burnPerMin: 0,
     tpm: 0,
   };
 
   const el = {
-    poolValue: document.getElementById('poolValue'),
+    poolValue:  document.getElementById('poolValue'),
     poolAmount: document.getElementById('poolAmount'),
     spentValue: document.getElementById('spentValue'),
-    burnRate: document.getElementById('burnRate'),
-    tpm: document.getElementById('tpm'),
-    deltaFlash: document.getElementById('deltaFlash'),
+    burnRate:   document.getElementById('burnRate'),
+    tpm:        document.getElementById('tpm'),
   };
 
   // bind static rows by data-id
@@ -577,14 +552,14 @@
     };
   });
 
-  function fmtKc(n, decimals) {
-    return n.toLocaleString('cs-CZ', {
+  function fmtUsd(n, decimals) {
+    return n.toLocaleString('en-US', {
       minimumFractionDigits: decimals,
       maximumFractionDigits: decimals,
     });
   }
   function fmtPct(n) {
-    return n.toLocaleString('cs-CZ', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + ' %';
+    return n.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + '%';
   }
   function rand(min, max) { return Math.random() * (max - min) + min; }
 
@@ -603,19 +578,15 @@
     return rand(140, 320);
   }
 
-  // DELTA SIZE (Kč per update) - calibrated to ~120 Kč/s avg, ~30-40 min to hit cap
-  //  1%  massive    1500-4500   (enterprise batch job)
-  //  5%  big         300-1200
-  // 20%  medium       80-340
-  // 55%  normal       18-80
-  // 19%  small         3-18
+  // DELTA SIZE ($) - small steady increments, no mega/big tx
+  // 10%  medium    $10-30
+  // 60%  normal    $1.50-8.00
+  // 30%  small     $0.20-1.20
   function nextDelta() {
     const r = Math.random();
-    if (r < 0.01) return rand(1500, 4500);
-    if (r < 0.06) return rand(300, 1200);
-    if (r < 0.26) return rand(80, 340);
-    if (r < 0.81) return rand(18, 80);
-    return rand(3, 18);
+    if (r < 0.10) return rand(10, 30);
+    if (r < 0.70) return rand(1.50, 8.00);
+    return rand(0.20, 1.20);
   }
 
   function pickProvider() {
@@ -639,73 +610,61 @@
   }
 
   let burstQueue = 0;
-  // dual rolling windows
-  let recent10s = []; // for burn-per-second display (responsive)
-  let recent60s = []; // for tokens/min and burn-per-min (smoother)
+  let recent10s = [];
+  let recent60s = [];
 
   function tick() {
-    if (burstQueue === 0 && Math.random() < 0.05) {
-      burstQueue = Math.floor(rand(2, 5));
+    if (burstQueue === 0 && Math.random() < 0.04) {
+      burstQueue = Math.floor(rand(2, 4)); // smaller bursts
     }
     const inBurst = burstQueue > 0;
     if (inBurst) burstQueue--;
 
     const provider = pickProvider();
-    let delta = nextDelta() * (inBurst ? 0.55 : 1);
+    let delta = nextDelta() * (inBurst ? 0.40 : 1);
     delta = scaleNearCap(delta);
 
-    if (delta < 0.5) return null; // we are at the cap
+    if (delta < 0.05) return; // at cap
 
     state.total = Math.min(state.total + delta, HARD_CAP);
-    state.lastDelta = delta;
     provider.spent += delta;
 
     const now = performance.now();
-    const tokens = delta * provider.tokKc;
+    const tokens = delta * provider.tokUsd;
 
-    recent10s.push({ t: now, kc: delta });
-    recent60s.push({ t: now, kc: delta, tok: tokens });
+    recent10s.push({ t: now, usd: delta });
+    recent60s.push({ t: now, usd: delta, tok: tokens });
     recent10s = recent10s.filter(d => now - d.t < 10000);
     recent60s = recent60s.filter(d => now - d.t < 60000);
 
-    state.burnPerSec = recent10s.reduce((s, d) => s + d.kc, 0) / 10;
-    state.burnPerMin = recent60s.reduce((s, d) => s + d.kc, 0);
+    state.burnPerSec = recent10s.reduce((s, d) => s + d.usd, 0) / 10;
+    state.burnPerMin = recent60s.reduce((s, d) => s + d.usd, 0);
     state.tpm = recent60s.reduce((s, d) => s + d.tok, 0);
-
-    return { provider, delta };
   }
 
-  function render(lastTick) {
-    el.poolValue.textContent = fmtKc(Math.round(state.total), 0);
-    el.spentValue.textContent = fmtKc(Math.round(state.burnPerMin), 0) + ' Kč';
-    el.burnRate.textContent = fmtKc(state.burnPerSec, state.burnPerSec < 100 ? 1 : 0);
-    el.tpm.textContent = fmtKc(Math.round(state.tpm), 0);
+  function render() {
+    el.poolValue.textContent = Math.round(state.total).toLocaleString('en-US');
+    el.spentValue.textContent = '$' + fmtUsd(state.burnPerMin, 2);
+    el.burnRate.textContent = fmtUsd(state.burnPerSec, 2);
+    el.tpm.textContent = Math.round(state.tpm).toLocaleString('en-US');
 
     PROVIDERS.forEach(p => {
       const pct = (p.spent / state.total) * 100;
       const row = providerRows[p.id];
       row.pct.textContent = fmtPct(pct);
       row.bar.style.width = pct.toFixed(1) + '%';
-      row.spend.textContent = fmtKc(Math.round(p.spent), 0) + ' Kč';
+      row.spend.textContent = '$' + Math.round(p.spent).toLocaleString('en-US');
     });
-
-    if (lastTick && state.lastDelta > 0) {
-      const dec = state.lastDelta < 10 ? 1 : 0;
-      el.deltaFlash.textContent = '+' + fmtKc(state.lastDelta, dec) + ' Kč · ' + lastTick.provider.name;
-      el.deltaFlash.classList.remove('show');
-      void el.deltaFlash.offsetWidth; // restart animation
-      el.deltaFlash.classList.add('show');
-    }
 
     el.poolAmount.classList.add('flicker');
     setTimeout(() => el.poolAmount.classList.remove('flicker'), 220);
   }
 
-  render(null);
+  render();
 
   function loop() {
-    const lastTick = tick();
-    render(lastTick);
+    tick();
+    render();
     const interval = burstQueue > 0 ? rand(110, 260) : nextInterval();
     setTimeout(loop, interval);
   }
