@@ -1,23 +1,25 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="cs">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Claude - Global Credit Pool</title>
-<meta name="description" content="Live credit pool counter (demo)" />
+<title>AI Network - Global Credit Pool</title>
+<meta name="description" content="Live AI network spend counter (demo)" />
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="0" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Newsreader:ital,wght@0,400;0,500;0,600;0,700&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
 <style>
   :root {
-    --bg: #141318;
-    --bg-grad-1: #1a1a24;
-    --bg-grad-2: #0d0c12;
-    --fg: #f5f4ef;
-    --fg-dim: #8a8a92;
-    --accent: #d97757;
-    --accent-glow: rgba(217, 119, 87, 0.35);
-    --line: rgba(245, 244, 239, 0.08);
+    --bg: #0A0A0C;
+    --bg-soft: #111114;
+    --fg: #F2F0ED;
+    --fg-dim: #6B6B70;
+    --fg-faint: #3A3A3F;
+    --line: rgba(242, 240, 237, 0.06);
+    --line-strong: rgba(242, 240, 237, 0.12);
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -26,23 +28,17 @@
     height: 100%;
     background: var(--bg);
     color: var(--fg);
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    font-family: 'Inter Tight', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    overflow: hidden;
   }
 
   body {
-    background:
-      radial-gradient(ellipse at 30% 20%, rgba(75, 65, 110, 0.22) 0%, transparent 55%),
-      radial-gradient(ellipse at 75% 80%, rgba(217, 119, 87, 0.08) 0%, transparent 60%),
-      linear-gradient(180deg, var(--bg-grad-1) 0%, var(--bg-grad-2) 100%);
     min-height: 100vh;
     display: flex;
     flex-direction: column;
   }
 
-  /* TOP NAV */
   header {
     display: flex;
     align-items: center;
@@ -54,42 +50,35 @@
   .brand {
     display: flex;
     align-items: center;
-    gap: 12px;
-  }
-
-  .brand-mark {
-    width: 22px;
-    height: 22px;
-    color: var(--accent);
-  }
-
-  .brand-text {
-    font-size: 18px;
-    font-weight: 500;
-    letter-spacing: -0.01em;
-  }
-
-  .brand-by {
-    font-size: 11px;
-    font-weight: 400;
-    color: var(--fg-dim);
-    margin-left: 6px;
-    letter-spacing: 0.04em;
+    gap: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
+  }
+
+  .brand-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--fg);
+    border-radius: 50%;
   }
 
   .nav-right {
     display: flex;
     align-items: center;
-    gap: 20px;
-    font-size: 13px;
+    gap: 22px;
+    font-size: 12px;
     color: var(--fg-dim);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
   }
 
   .status-dot {
     display: inline-flex;
     align-items: center;
     gap: 8px;
+    color: var(--fg);
   }
   .status-dot::before {
     content: '';
@@ -97,22 +86,20 @@
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: #4ade80;
-    box-shadow: 0 0 8px rgba(74, 222, 128, 0.6);
-    animation: pulse-dot 2s ease-in-out infinite;
+    background: var(--fg);
+    animation: pulse-dot 1.8s ease-in-out infinite;
   }
-
   @keyframes pulse-dot {
     0%, 100% { opacity: 1; }
-    50% { opacity: 0.4; }
+    50% { opacity: 0.25; }
   }
 
   .menu-btn {
     width: 28px;
     height: 28px;
     border-radius: 50%;
-    border: 1px solid var(--line);
-    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--line-strong);
+    background: transparent;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -120,86 +107,66 @@
     color: var(--fg-dim);
   }
 
-  /* MAIN */
   main {
     flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 40px 24px;
+    padding: 56px 24px;
   }
 
   .counter-card {
     text-align: center;
-    max-width: 760px;
+    max-width: 880px;
     width: 100%;
-  }
-
-  .asterisk {
-    width: 38px;
-    height: 38px;
-    color: var(--accent);
-    margin: 0 auto 28px;
-    filter: drop-shadow(0 0 12px var(--accent-glow));
-    animation: spin-slow 24s linear infinite;
-  }
-
-  @keyframes spin-slow {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
   }
 
   .label {
     font-size: 11px;
     font-weight: 500;
-    letter-spacing: 0.22em;
+    letter-spacing: 0.28em;
     text-transform: uppercase;
     color: var(--fg-dim);
-    margin-bottom: 28px;
+    margin-bottom: 36px;
   }
-
   .label .sep {
-    color: var(--accent);
-    margin: 0 8px;
+    color: var(--fg-faint);
+    margin: 0 10px;
   }
 
   .pool-amount {
     position: relative;
     display: inline-block;
-    font-family: 'Newsreader', 'Times New Roman', serif;
-    font-size: clamp(72px, 14vw, 184px);
-    font-weight: 500;
-    letter-spacing: -0.04em;
-    line-height: 1;
+    font-family: 'Inter Tight', sans-serif;
+    font-size: clamp(72px, 13vw, 176px);
+    font-weight: 700;
+    letter-spacing: -0.045em;
+    line-height: 0.95;
     color: var(--fg);
-    margin-bottom: 26px;
+    margin-bottom: 22px;
     font-variant-numeric: tabular-nums;
     transition: transform 0.4s ease-out;
-    text-shadow: 0 0 60px rgba(245, 244, 239, 0.04);
   }
-
-  .pool-amount.flicker {
-    transform: scale(1.003);
-  }
-
-  .pool-amount .currency {
-    font-size: 0.55em;
-    vertical-align: top;
-    margin-right: 2px;
+  .pool-amount.flicker { transform: scale(1.002); }
+  .pool-amount .currency-suffix {
+    font-size: 0.32em;
+    margin-left: 0.18em;
     color: var(--fg-dim);
-    font-weight: 400;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    vertical-align: 0.6em;
   }
 
   .delta-flash {
     position: absolute;
-    top: 4%;
-    right: -8px;
+    top: 16%;
+    right: -10px;
     transform: translateX(100%);
-    font-family: 'Inter', sans-serif;
-    font-size: 0.14em;
+    font-family: 'Inter Tight', sans-serif;
+    font-size: 0.13em;
     font-weight: 500;
-    color: var(--accent);
-    letter-spacing: 0.02em;
+    color: var(--fg);
+    letter-spacing: 0.04em;
     opacity: 0;
     pointer-events: none;
     white-space: nowrap;
@@ -209,113 +176,332 @@
   }
   @keyframes delta-pop {
     0%   { opacity: 0; transform: translate(100%, 12px); }
-    18%  { opacity: 1; transform: translate(100%, -2px); }
+    18%  { opacity: 0.85; transform: translate(100%, -2px); }
     100% { opacity: 0; transform: translate(110%, -42px); }
   }
 
   .spent-line {
     font-size: 13px;
     color: var(--fg-dim);
-    letter-spacing: 0.02em;
+    letter-spacing: 0.04em;
+    margin-bottom: 56px;
   }
-
   .spent-line .amount {
-    color: var(--accent);
+    color: var(--fg);
     font-variant-numeric: tabular-nums;
     font-weight: 500;
   }
-
   .spent-line .live {
     display: inline-block;
-    margin-left: 10px;
-    padding: 2px 8px;
+    margin-left: 12px;
+    padding: 3px 10px;
+    border: 1px solid var(--line-strong);
     border-radius: 999px;
-    background: rgba(217, 119, 87, 0.12);
-    border: 1px solid rgba(217, 119, 87, 0.3);
     font-size: 10px;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: var(--accent);
+    color: var(--fg);
   }
 
-  /* FOOTER STATS */
+  .providers {
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    background: var(--bg-soft);
+    overflow: hidden;
+    text-align: left;
+  }
+  .providers-head {
+    display: grid;
+    grid-template-columns: 36px 1fr 110px 130px;
+    padding: 14px 22px;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--fg-dim);
+    border-bottom: 1px solid var(--line);
+    align-items: center;
+  }
+  .providers-head .col-share { text-align: right; }
+  .providers-head .col-spend { text-align: right; }
+
+  .provider {
+    display: grid;
+    grid-template-columns: 36px 1fr 110px 130px;
+    padding: 16px 22px;
+    align-items: center;
+    border-bottom: 1px solid var(--line);
+    transition: background 0.2s;
+  }
+  .provider:last-child { border-bottom: none; }
+  .provider:hover { background: rgba(242, 240, 237, 0.02); }
+
+  .provider-logo {
+    width: 22px;
+    height: 22px;
+    color: var(--fg);
+  }
+  .provider-logo svg { width: 100%; height: 100%; display: block; }
+
+  .provider-name {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .provider-name .name {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--fg);
+    letter-spacing: 0.01em;
+  }
+  .provider-name .meta {
+    font-size: 10px;
+    color: var(--fg-faint);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .provider-share {
+    font-size: 13px;
+    color: var(--fg-dim);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    position: relative;
+    padding-right: 14px;
+  }
+  .provider-bar {
+    position: absolute;
+    bottom: -8px;
+    right: 14px;
+    left: 30%;
+    height: 2px;
+    background: var(--line);
+  }
+  .provider-bar .bar-fill {
+    display: block;
+    height: 100%;
+    width: 0%;
+    background: var(--fg);
+    transition: width 0.6s ease-out;
+  }
+
+  .provider-spend {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--fg);
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+  }
+
   footer {
     display: flex;
     justify-content: center;
-    gap: 64px;
-    padding: 24px 36px 36px;
+    gap: 80px;
+    padding: 28px 36px 36px;
     border-top: 1px solid var(--line);
   }
 
-  .stat {
-    text-align: center;
-  }
-
+  .stat { text-align: center; }
   .stat-label {
     font-size: 10px;
     font-weight: 500;
-    letter-spacing: 0.18em;
+    letter-spacing: 0.22em;
     text-transform: uppercase;
     color: var(--fg-dim);
-    margin-bottom: 6px;
+    margin-bottom: 8px;
   }
-
   .stat-value {
-    font-size: 16px;
+    font-size: 18px;
     font-weight: 500;
     color: var(--fg);
     font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
   }
-
-  .stat-value .delta {
+  .stat-value .unit {
     font-size: 11px;
-    color: var(--accent);
-    margin-left: 6px;
+    color: var(--fg-dim);
+    margin-left: 4px;
+    font-weight: 400;
   }
 
-  /* RESPONSIVE */
-  @media (max-width: 640px) {
-    header { padding: 16px 20px; }
-    .nav-right { gap: 12px; font-size: 11px; }
-    .brand-by { display: none; }
-    footer { gap: 24px; padding: 18px 16px 24px; flex-wrap: wrap; }
-    .stat-value { font-size: 13px; }
+  @media (max-width: 760px) {
+    header { padding: 14px 18px; }
+    .nav-right { gap: 10px; font-size: 10px; }
+    .nav-right .hide-sm { display: none; }
+    .providers-head, .provider { grid-template-columns: 30px 1fr 110px; padding-left: 14px; padding-right: 14px; }
+    .providers-head .col-share, .provider-share { display: none; }
+    footer { gap: 24px; padding: 18px 14px 24px; flex-wrap: wrap; }
+    .stat-value { font-size: 14px; }
+    main { padding: 32px 14px; }
+    .spent-line { margin-bottom: 36px; }
   }
 </style>
 </head>
 <body>
   <header>
     <div class="brand">
-      <svg class="brand-mark" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-        <path d="M12 0 L13.8 9.4 L22 4.4 L17 12.6 L24 14.4 L14.6 16.2 L19.6 24 L12 19 L4.4 24 L9.4 16.2 L0 14.4 L7 12.6 L2 4.4 L10.2 9.4 Z"/>
-      </svg>
-      <span class="brand-text">Claude<span class="brand-by">by Anthropic</span></span>
+      <span class="brand-dot"></span>
+      <span>AI Network</span>
     </div>
     <div class="nav-right">
       <span class="status-dot">Live</span>
-      <span>API</span>
-      <span>Docs</span>
+      <span class="hide-sm">API</span>
+      <span class="hide-sm">Docs</span>
       <button class="menu-btn" aria-label="menu">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/></svg>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="2.5"/></svg>
       </button>
     </div>
   </header>
 
   <main>
     <div class="counter-card">
-      <svg class="asterisk" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-        <path d="M12 0 L13.8 9.4 L22 4.4 L17 12.6 L24 14.4 L14.6 16.2 L19.6 24 L12 19 L4.4 24 L9.4 16.2 L0 14.4 L7 12.6 L2 4.4 L10.2 9.4 Z"/>
-      </svg>
       <div class="label">
-        Global Usage<span class="sep">&middot;</span>Today
+        Global Credit Pool<span class="sep">&middot;</span>Spent Today
       </div>
       <div class="pool-amount" id="poolAmount">
-        <span class="currency">$</span><span id="poolValue">58,793</span>
+        <span id="poolValue">723&nbsp;324</span><span class="currency-suffix">Kč</span>
         <span class="delta-flash" id="deltaFlash"></span>
       </div>
       <div class="spent-line">
-        Burning <span class="amount" id="spentValue">$0.00</span>/min across the network
+        Burning <span class="amount" id="spentValue">0 Kč</span>/min across the network
         <span class="live">Live</span>
+      </div>
+
+      <div class="providers" id="providers">
+        <div class="providers-head">
+          <span></span>
+          <span>Provider</span>
+          <span class="col-share">Share</span>
+          <span class="col-spend">Spent</span>
+        </div>
+
+        <div class="provider" data-id="anthropic">
+          <div class="provider-logo">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 0 L13.8 9.4 L22 4.4 L17 12.6 L24 14.4 L14.6 16.2 L19.6 24 L12 19 L4.4 24 L9.4 16.2 L0 14.4 L7 12.6 L2 4.4 L10.2 9.4 Z"/>
+            </svg>
+          </div>
+          <div class="provider-name">
+            <span class="name">Anthropic</span>
+            <span class="meta">Claude Sonnet / Opus</span>
+          </div>
+          <div class="provider-share">
+            <span class="share-pct">0,0&nbsp;%</span>
+            <span class="provider-bar"><span class="bar-fill"></span></span>
+          </div>
+          <div class="provider-spend">0&nbsp;Kč</div>
+        </div>
+
+        <div class="provider" data-id="openai">
+          <div class="provider-logo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+              <ellipse cx="12" cy="12" rx="9" ry="3.6"/>
+              <ellipse cx="12" cy="12" rx="9" ry="3.6" transform="rotate(60 12 12)"/>
+              <ellipse cx="12" cy="12" rx="9" ry="3.6" transform="rotate(120 12 12)"/>
+            </svg>
+          </div>
+          <div class="provider-name">
+            <span class="name">OpenAI</span>
+            <span class="meta">GPT-5 / Codex</span>
+          </div>
+          <div class="provider-share">
+            <span class="share-pct">0,0&nbsp;%</span>
+            <span class="provider-bar"><span class="bar-fill"></span></span>
+          </div>
+          <div class="provider-spend">0&nbsp;Kč</div>
+        </div>
+
+        <div class="provider" data-id="openrouter">
+          <div class="provider-logo">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <rect x="2" y="6" width="13" height="2.6" rx="1.3"/>
+              <rect x="6" y="10.7" width="13" height="2.6" rx="1.3"/>
+              <rect x="2" y="15.4" width="13" height="2.6" rx="1.3"/>
+              <circle cx="20" cy="7.3" r="1.6"/>
+              <circle cx="20" cy="16.7" r="1.6"/>
+            </svg>
+          </div>
+          <div class="provider-name">
+            <span class="name">OpenRouter</span>
+            <span class="meta">Multi-model gateway</span>
+          </div>
+          <div class="provider-share">
+            <span class="share-pct">0,0&nbsp;%</span>
+            <span class="provider-bar"><span class="bar-fill"></span></span>
+          </div>
+          <div class="provider-spend">0&nbsp;Kč</div>
+        </div>
+
+        <div class="provider" data-id="google">
+          <div class="provider-logo">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 2 C12.4 8.5 15.5 11.6 22 12 C15.5 12.4 12.4 15.5 12 22 C11.6 15.5 8.5 12.4 2 12 C8.5 11.6 11.6 8.5 12 2 Z"/>
+            </svg>
+          </div>
+          <div class="provider-name">
+            <span class="name">Google</span>
+            <span class="meta">Gemini 2.5 Pro</span>
+          </div>
+          <div class="provider-share">
+            <span class="share-pct">0,0&nbsp;%</span>
+            <span class="provider-bar"><span class="bar-fill"></span></span>
+          </div>
+          <div class="provider-spend">0&nbsp;Kč</div>
+        </div>
+
+        <div class="provider" data-id="xai">
+          <div class="provider-logo">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M3 3 L7.4 3 L12 9.2 L16.6 3 L21 3 L14.2 12 L21 21 L16.6 21 L12 14.8 L7.4 21 L3 21 L9.8 12 Z"/>
+            </svg>
+          </div>
+          <div class="provider-name">
+            <span class="name">xAI</span>
+            <span class="meta">Grok 4</span>
+          </div>
+          <div class="provider-share">
+            <span class="share-pct">0,0&nbsp;%</span>
+            <span class="provider-bar"><span class="bar-fill"></span></span>
+          </div>
+          <div class="provider-spend">0&nbsp;Kč</div>
+        </div>
+
+        <div class="provider" data-id="deepseek">
+          <div class="provider-logo">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M3 13 Q4.5 8.5 9.5 8.5 Q14.5 8.5 16.5 10.6 L20.5 8.6 L19.4 12.6 L21 13.5 L19.4 14.4 L20.5 18.4 L16.5 16.4 Q14.5 18.5 9.5 18.5 Q4.5 18.5 3 14 Z"/>
+              <circle cx="13" cy="12.6" r="0.8" fill="#0A0A0C"/>
+            </svg>
+          </div>
+          <div class="provider-name">
+            <span class="name">DeepSeek</span>
+            <span class="meta">V3.2</span>
+          </div>
+          <div class="provider-share">
+            <span class="share-pct">0,0&nbsp;%</span>
+            <span class="provider-bar"><span class="bar-fill"></span></span>
+          </div>
+          <div class="provider-spend">0&nbsp;Kč</div>
+        </div>
+
+        <div class="provider" data-id="mistral">
+          <div class="provider-logo">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <rect x="3" y="4" width="6" height="16"/>
+              <rect x="11" y="4" width="2" height="16" opacity="0.55"/>
+              <rect x="15" y="4" width="6" height="16" opacity="0.3"/>
+            </svg>
+          </div>
+          <div class="provider-name">
+            <span class="name">Mistral</span>
+            <span class="meta">Large 3</span>
+          </div>
+          <div class="provider-share">
+            <span class="share-pct">0,0&nbsp;%</span>
+            <span class="provider-bar"><span class="bar-fill"></span></span>
+          </div>
+          <div class="provider-spend">0&nbsp;Kč</div>
+        </div>
       </div>
     </div>
   </main>
@@ -323,34 +509,52 @@
   <footer>
     <div class="stat">
       <div class="stat-label">Burn Rate</div>
-      <div class="stat-value"><span id="burnRate">0.00</span>/s</div>
-    </div>
-    <div class="stat">
-      <div class="stat-label">Active Sessions</div>
-      <div class="stat-value"><span id="sessions">0</span><span class="delta" id="sessionsDelta">+0</span></div>
+      <div class="stat-value"><span id="burnRate">0</span><span class="unit">Kč/s</span></div>
     </div>
     <div class="stat">
       <div class="stat-label">Tokens / Min</div>
       <div class="stat-value"><span id="tpm">0</span></div>
     </div>
     <div class="stat">
-      <div class="stat-label">Models Online</div>
-      <div class="stat-value">3<span class="delta">all</span></div>
+      <div class="stat-label">Providers Online</div>
+      <div class="stat-value"><span id="online">7</span><span class="unit">/ 7</span></div>
     </div>
   </footer>
 
 <script>
-  // FAKE COUNTER ENGINE
-  // Counter rises ("today's global usage"), with realistic non-uniform cadence:
-  //   long pauses, slow flow, normal flow, occasional rapid bursts,
-  //   and rare "mega transactions" - so it never feels like a metronome.
+  // PROVIDER REGISTRY
+  // weight   = traffic share (% of ticks routed to this provider)
+  // tokKc    = tokens you get per 1 Kč spent (blended input/output, real API pricing tiers)
+  //            Anthropic Sonnet ~$3/$15 per Mtok -> ~5k tok/Kc
+  //            OpenAI GPT-5    ~$3/$15 per Mtok -> ~5k tok/Kc
+  //            OpenRouter      blended           -> ~10k tok/Kc
+  //            Gemini 2.5 Pro  ~$1.25/$5 per Mtok -> ~14k tok/Kc
+  //            Grok 4          ~$3/$15 per Mtok  -> ~5k tok/Kc
+  //            DeepSeek V3.2   ~$0.14/$0.28 Mtok -> ~210k tok/Kc
+  //            Mistral Large 3 ~$2/$6 per Mtok   -> ~10k tok/Kc
+  const PROVIDERS = [
+    { id: 'anthropic',  name: 'Anthropic',  weight: 32, tokKc:   5000 },
+    { id: 'openai',     name: 'OpenAI',     weight: 26, tokKc:   5000 },
+    { id: 'openrouter', name: 'OpenRouter', weight: 12, tokKc:  10000 },
+    { id: 'google',     name: 'Google',     weight: 10, tokKc:  14000 },
+    { id: 'xai',        name: 'xAI',        weight:  8, tokKc:   5000 },
+    { id: 'deepseek',   name: 'DeepSeek',   weight:  7, tokKc: 210000 },
+    { id: 'mistral',    name: 'Mistral',    weight:  5, tokKc:  10000 },
+  ];
+
+  const TOTAL_START = 723324;
+  const HARD_CAP    = 999999;
+  const SOFT_CAP_HEADROOM = 60000; // start damping deltas in last 60k Kč
+
+  const totalWeight = PROVIDERS.reduce((s, p) => s + p.weight, 0);
+  PROVIDERS.forEach(p => { p.share = p.weight / totalWeight; p.spent = TOTAL_START * p.share; });
 
   const state = {
-    total: 58793.42,
-    sessions: 142,
-    sessionsLast: 142,
+    total: TOTAL_START,
     lastDelta: 0,
+    burnPerSec: 0,
     burnPerMin: 0,
+    tpm: 0,
   };
 
   const el = {
@@ -358,29 +562,38 @@
     poolAmount: document.getElementById('poolAmount'),
     spentValue: document.getElementById('spentValue'),
     burnRate: document.getElementById('burnRate'),
-    sessions: document.getElementById('sessions'),
-    sessionsDelta: document.getElementById('sessionsDelta'),
     tpm: document.getElementById('tpm'),
     deltaFlash: document.getElementById('deltaFlash'),
   };
 
-  function fmt(n, decimals) {
-    return n.toLocaleString('en-US', {
+  // bind static rows by data-id
+  const providerRows = {};
+  PROVIDERS.forEach(p => {
+    const row = document.querySelector('.provider[data-id="' + p.id + '"]');
+    providerRows[p.id] = {
+      pct:   row.querySelector('.share-pct'),
+      bar:   row.querySelector('.bar-fill'),
+      spend: row.querySelector('.provider-spend'),
+    };
+  });
+
+  function fmtKc(n, decimals) {
+    return n.toLocaleString('cs-CZ', {
       minimumFractionDigits: decimals,
       maximumFractionDigits: decimals,
     });
   }
-
-  function rand(min, max) {
-    return Math.random() * (max - min) + min;
+  function fmtPct(n) {
+    return n.toLocaleString('cs-CZ', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + ' %';
   }
+  function rand(min, max) { return Math.random() * (max - min) + min; }
 
-  // INTERVAL DISTRIBUTION (ms between updates):
-  //   5%  long pause (3.2-6.0s) - quiet moment, no traffic
-  //   25% slow flow  (1.2-2.4s)
-  //   35% medium     (0.6-1.3s)
-  //   25% normal     (0.3-0.7s)
-  //   10% quick      (0.14-0.32s)
+  // INTERVAL DISTRIBUTION (ms between updates)
+  //  5%  long pause   3.2-6.0s
+  // 25%  slow flow    1.2-2.4s
+  // 35%  medium       0.6-1.3s
+  // 25%  normal       0.3-0.7s
+  // 10%  quick        0.14-0.32s
   function nextInterval() {
     const r = Math.random();
     if (r < 0.05) return rand(3200, 6000);
@@ -390,76 +603,97 @@
     return rand(140, 320);
   }
 
-  // DELTA SIZE DISTRIBUTION ($ per update):
-  //   1%  massive    ($220-680)  - large enterprise transaction
-  //   5%  big        ($60-180)
-  //   20% medium     ($8-40)
-  //   55% normal     ($1.40-8.00)
-  //   19% small      ($0.20-1.40)
+  // DELTA SIZE (Kč per update) - calibrated to ~120 Kč/s avg, ~30-40 min to hit cap
+  //  1%  massive    1500-4500   (enterprise batch job)
+  //  5%  big         300-1200
+  // 20%  medium       80-340
+  // 55%  normal       18-80
+  // 19%  small         3-18
   function nextDelta() {
     const r = Math.random();
-    if (r < 0.01) return rand(220, 680);
-    if (r < 0.06) return rand(60, 180);
-    if (r < 0.26) return rand(8, 40);
-    if (r < 0.81) return rand(1.40, 8.00);
-    return rand(0.20, 1.40);
+    if (r < 0.01) return rand(1500, 4500);
+    if (r < 0.06) return rand(300, 1200);
+    if (r < 0.26) return rand(80, 340);
+    if (r < 0.81) return rand(18, 80);
+    return rand(3, 18);
   }
 
-  // BURST: occasionally fire 2-4 quick updates in 100-280ms each
+  function pickProvider() {
+    const r = Math.random() * totalWeight;
+    let cum = 0;
+    for (const p of PROVIDERS) {
+      cum += p.weight;
+      if (r < cum) return p;
+    }
+    return PROVIDERS[0];
+  }
+
+  // soft cap: scale delta down asymptotically when nearing HARD_CAP
+  function scaleNearCap(delta) {
+    const headroom = HARD_CAP - state.total;
+    if (headroom <= 0) return 0;
+    if (headroom < SOFT_CAP_HEADROOM) {
+      return delta * (headroom / SOFT_CAP_HEADROOM);
+    }
+    return delta;
+  }
+
   let burstQueue = 0;
-  let recentDeltas = []; // last 60s for burn-per-min display
+  // dual rolling windows
+  let recent10s = []; // for burn-per-second display (responsive)
+  let recent60s = []; // for tokens/min and burn-per-min (smoother)
 
   function tick() {
     if (burstQueue === 0 && Math.random() < 0.05) {
-      burstQueue = Math.floor(rand(2, 5)); // 2-4
+      burstQueue = Math.floor(rand(2, 5));
     }
-
     const inBurst = burstQueue > 0;
     if (inBurst) burstQueue--;
 
-    // burst deltas are smaller (rapid micro-charges) so visual jumps make sense
-    const delta = nextDelta() * (inBurst ? 0.55 : 1);
-    state.total += delta;
+    const provider = pickProvider();
+    let delta = nextDelta() * (inBurst ? 0.55 : 1);
+    delta = scaleNearCap(delta);
+
+    if (delta < 0.5) return null; // we are at the cap
+
+    state.total = Math.min(state.total + delta, HARD_CAP);
     state.lastDelta = delta;
+    provider.spent += delta;
 
-    // burn-per-min: sum of last 60s of deltas
     const now = performance.now();
-    recentDeltas.push({ t: now, v: delta });
-    recentDeltas = recentDeltas.filter(d => now - d.t < 60000);
-    state.burnPerMin = recentDeltas.reduce((s, d) => s + d.v, 0);
+    const tokens = delta * provider.tokKc;
 
-    // sessions drift occasionally
-    if (Math.random() < 0.10) {
-      const change = Math.round(rand(-2, 5));
-      state.sessions = Math.max(80, state.sessions + change);
-    }
+    recent10s.push({ t: now, kc: delta });
+    recent60s.push({ t: now, kc: delta, tok: tokens });
+    recent10s = recent10s.filter(d => now - d.t < 10000);
+    recent60s = recent60s.filter(d => now - d.t < 60000);
 
-    return inBurst;
+    state.burnPerSec = recent10s.reduce((s, d) => s + d.kc, 0) / 10;
+    state.burnPerMin = recent60s.reduce((s, d) => s + d.kc, 0);
+    state.tpm = recent60s.reduce((s, d) => s + d.tok, 0);
+
+    return { provider, delta };
   }
 
-  function render() {
-    // integer display - matches screenshot aesthetic
-    el.poolValue.textContent = Math.round(state.total).toLocaleString('en-US');
+  function render(lastTick) {
+    el.poolValue.textContent = fmtKc(Math.round(state.total), 0);
+    el.spentValue.textContent = fmtKc(Math.round(state.burnPerMin), 0) + ' Kč';
+    el.burnRate.textContent = fmtKc(state.burnPerSec, state.burnPerSec < 100 ? 1 : 0);
+    el.tpm.textContent = fmtKc(Math.round(state.tpm), 0);
 
-    el.spentValue.textContent = '$' + fmt(state.burnPerMin, 2);
-    el.burnRate.textContent = '$' + fmt(state.burnPerMin / 60, 2);
+    PROVIDERS.forEach(p => {
+      const pct = (p.spent / state.total) * 100;
+      const row = providerRows[p.id];
+      row.pct.textContent = fmtPct(pct);
+      row.bar.style.width = pct.toFixed(1) + '%';
+      row.spend.textContent = fmtKc(Math.round(p.spent), 0) + ' Kč';
+    });
 
-    el.sessions.textContent = state.sessions.toLocaleString('en-US');
-    const sd = state.sessions - state.sessionsLast;
-    if (sd !== 0) {
-      el.sessionsDelta.textContent = (sd > 0 ? '+' : '') + sd;
-      el.sessionsDelta.style.color = sd > 0 ? 'var(--accent)' : '#ef4444';
-    }
-
-    // tokens per min: burn * 180-320 (rough avg cost-per-token bucket)
-    el.tpm.textContent = Math.round(state.burnPerMin * rand(180, 320)).toLocaleString('en-US');
-
-    // delta flash - shows the actual increment that just landed
-    if (state.lastDelta > 0) {
-      const decimals = state.lastDelta < 10 ? 2 : 0;
-      el.deltaFlash.textContent = '+$' + fmt(state.lastDelta, decimals);
+    if (lastTick && state.lastDelta > 0) {
+      const dec = state.lastDelta < 10 ? 1 : 0;
+      el.deltaFlash.textContent = '+' + fmtKc(state.lastDelta, dec) + ' Kč · ' + lastTick.provider.name;
       el.deltaFlash.classList.remove('show');
-      void el.deltaFlash.offsetWidth; // force reflow to restart animation
+      void el.deltaFlash.offsetWidth; // restart animation
       el.deltaFlash.classList.add('show');
     }
 
@@ -467,14 +701,11 @@
     setTimeout(() => el.poolAmount.classList.remove('flicker'), 220);
   }
 
-  setInterval(() => { state.sessionsLast = state.sessions; }, 10000);
-
-  render();
+  render(null);
 
   function loop() {
-    tick();
-    render();
-    // burst sequence: short interval; otherwise weighted distribution
+    const lastTick = tick();
+    render(lastTick);
     const interval = burstQueue > 0 ? rand(110, 260) : nextInterval();
     setTimeout(loop, interval);
   }
