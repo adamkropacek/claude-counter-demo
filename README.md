@@ -29,5 +29,12 @@ Hostovano na GitHub Pages. URL po setupu: `https://adamkropacek.github.io/<repo-
 ## Stack
 
 - HTML + CSS + vanilla JS
-- Google Fonts: Inter, Newsreader
+- Google Fonts: Inter Tight
 - Zero dependencies, zero build
+
+## Spotify Now Playing widget
+
+Bottom-right widget zobrazuje real-time Spotify track Adama. Vyžaduje one-time setup
+(Spotify Dev App + Cloudflare Worker proxy) - viz `spotify-worker/SETUP.md`.
+
+Bez setupu se widget zobrazi v "Spotify offline / setup pending" stavu (ne-rušivý).

@@ -1,0 +1,15 @@
+name = "spotify-now-playing"
+main = "worker.js"
+compatibility_date = "2026-05-01"
+
+# Public URL after deploy:
+#   https://spotify-now-playing.<your-cloudflare-account>.workers.dev
+# Then put that URL into index.html SPOTIFY_PROXY_URL
+
+[vars]
+ALLOWED_ORIGIN = "https://adamkropacek.github.io"
+
+# Secrets - set via CLI, NOT here:
+#   wrangler secret put SPOTIFY_CLIENT_ID
+#   wrangler secret put SPOTIFY_CLIENT_SECRET
+#   wrangler secret put SPOTIFY_REFRESH_TOKEN

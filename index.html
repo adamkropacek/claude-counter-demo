@@ -302,6 +302,115 @@
     font-weight: 400;
   }
 
+  /* SPOTIFY NOW PLAYING WIDGET */
+  .now-playing {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px 10px 10px;
+    background: rgba(17, 17, 20, 0.85);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid var(--line-strong);
+    border-radius: 8px;
+    max-width: 320px;
+    font-size: 12px;
+    z-index: 100;
+    text-decoration: none;
+    color: inherit;
+    transition: opacity 0.3s, transform 0.3s;
+    opacity: 0.92;
+  }
+  .now-playing:hover { opacity: 1; transform: translateY(-1px); }
+  .now-playing.empty { opacity: 0.45; }
+
+  .np-art {
+    width: 44px;
+    height: 44px;
+    border-radius: 4px;
+    background: var(--bg-soft);
+    flex-shrink: 0;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--fg-faint);
+    font-size: 18px;
+    position: relative;
+    overflow: hidden;
+  }
+  .np-art::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.2);
+    border-radius: inherit;
+    pointer-events: none;
+  }
+
+  .np-info {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+    flex: 1;
+  }
+  .np-meta-line {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--fg-faint);
+  }
+  .np-meta-line .dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #1ED760;
+    box-shadow: 0 0 6px rgba(30, 215, 96, 0.6);
+    animation: pulse-dot 1.6s ease-in-out infinite;
+  }
+  .now-playing.empty .np-meta-line .dot {
+    background: var(--fg-faint);
+    box-shadow: none;
+    animation: none;
+  }
+  .np-track {
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--fg);
+    letter-spacing: 0.005em;
+  }
+  .np-artist {
+    font-size: 11px;
+    color: var(--fg-dim);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .np-progress {
+    height: 2px;
+    background: var(--line);
+    margin-top: 6px;
+    border-radius: 1px;
+    overflow: hidden;
+  }
+  .np-progress-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--fg);
+    border-radius: 1px;
+    transition: width 0.9s linear;
+  }
+
   @media (max-width: 760px) {
     header { padding: 14px 18px; }
     .nav-right { gap: 10px; font-size: 10px; }
@@ -312,6 +421,8 @@
     .stat-value { font-size: 14px; }
     main { padding: 32px 14px; }
     .spent-line { margin-bottom: 36px; }
+    .now-playing { bottom: 12px; right: 12px; max-width: 240px; padding: 8px 12px 8px 8px; }
+    .np-art { width: 36px; height: 36px; }
   }
 </style>
 </head>
@@ -482,6 +593,16 @@
       </div>
     </div>
   </main>
+
+  <a class="now-playing empty" id="nowPlaying" href="#" target="_blank" rel="noopener">
+    <div class="np-art" id="npArt">&#9834;</div>
+    <div class="np-info">
+      <div class="np-meta-line"><span class="dot"></span><span>Now Playing</span></div>
+      <div class="np-track" id="npTrack">Spotify offline</div>
+      <div class="np-artist" id="npArtist">setup pending</div>
+      <div class="np-progress"><div class="np-progress-fill" id="npProgress"></div></div>
+    </div>
+  </a>
 
   <footer>
     <div class="stat">
@@ -669,6 +790,78 @@
     setTimeout(loop, interval);
   }
   setTimeout(loop, 700);
+
+  // ───────────── SPOTIFY NOW PLAYING ─────────────
+  // Set this to your Cloudflare Worker URL after deploying spotify-worker/.
+  // While empty, widget shows "Spotify offline / setup pending" gracefully.
+  const SPOTIFY_PROXY_URL = '';
+
+  const np = {
+    root:     document.getElementById('nowPlaying'),
+    art:      document.getElementById('npArt'),
+    track:    document.getElementById('npTrack'),
+    artist:   document.getElementById('npArtist'),
+    progress: document.getElementById('npProgress'),
+  };
+
+  function renderNowPlaying(data) {
+    if (!data || !data.is_playing || !data.track_name) {
+      np.root.classList.add('empty');
+      np.art.textContent = '♪';
+      np.art.style.backgroundImage = '';
+      np.track.textContent = SPOTIFY_PROXY_URL ? 'Nothing playing' : 'Spotify offline';
+      np.artist.textContent = SPOTIFY_PROXY_URL ? '' : 'setup pending';
+      np.progress.style.width = '0%';
+      np.root.removeAttribute('href');
+      return;
+    }
+
+    np.root.classList.remove('empty');
+    np.art.textContent = '';
+
+    // safety: only allow https Spotify CDN urls in background
+    if (data.album_art_url && /^https:\/\/(i\.scdn\.co|mosaic\.scdn\.co)\//.test(data.album_art_url)) {
+      np.art.style.backgroundImage = 'url("' + data.album_art_url.replace(/"/g, '%22') + '")';
+    } else {
+      np.art.style.backgroundImage = '';
+    }
+
+    np.track.textContent = data.track_name;
+    np.artist.textContent = data.artist_name || '';
+
+    const pct = (data.duration_ms && data.progress_ms != null)
+      ? Math.min(100, (data.progress_ms / data.duration_ms) * 100)
+      : 0;
+    np.progress.style.width = pct.toFixed(2) + '%';
+
+    if (data.track_url && /^https:\/\/open\.spotify\.com\//.test(data.track_url)) {
+      np.root.setAttribute('href', data.track_url);
+    } else {
+      np.root.removeAttribute('href');
+    }
+  }
+
+  async function fetchNowPlaying() {
+    if (!SPOTIFY_PROXY_URL) {
+      renderNowPlaying(null);
+      return;
+    }
+    try {
+      const res = await fetch(SPOTIFY_PROXY_URL, { cache: 'no-store' });
+      if (!res.ok) throw new Error('proxy ' + res.status);
+      const data = await res.json();
+      renderNowPlaying(data);
+    } catch (e) {
+      renderNowPlaying(null);
+    }
+  }
+
+  // initial render (empty state) + start polling every 15s
+  renderNowPlaying(null);
+  if (SPOTIFY_PROXY_URL) {
+    fetchNowPlaying();
+    setInterval(fetchNowPlaying, 15000);
+  }
 </script>
 </body>
 </html>
