@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Claude - Global Credit Pool</title>
+<meta name="description" content="Live credit pool counter (demo)" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Newsreader:ital,wght@0,400;0,500;0,600;0,700&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #141318;
+    --bg-grad-1: #1a1a24;
+    --bg-grad-2: #0d0c12;
+    --fg: #f5f4ef;
+    --fg-dim: #8a8a92;
+    --accent: #d97757;
+    --accent-glow: rgba(217, 119, 87, 0.35);
+    --line: rgba(245, 244, 239, 0.08);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow: hidden;
+  }
+
+  body {
+    background:
+      radial-gradient(ellipse at 30% 20%, rgba(75, 65, 110, 0.22) 0%, transparent 55%),
+      radial-gradient(ellipse at 75% 80%, rgba(217, 119, 87, 0.08) 0%, transparent 60%),
+      linear-gradient(180deg, var(--bg-grad-1) 0%, var(--bg-grad-2) 100%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* TOP NAV */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 22px 36px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .brand-mark {
+    width: 22px;
+    height: 22px;
+    color: var(--accent);
+  }
+
+  .brand-text {
+    font-size: 18px;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+
+  .brand-by {
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--fg-dim);
+    margin-left: 6px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .nav-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    font-size: 13px;
+    color: var(--fg-dim);
+  }
+
+  .status-dot {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .status-dot::before {
+    content: '';
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #4ade80;
+    box-shadow: 0 0 8px rgba(74, 222, 128, 0.6);
+    animation: pulse-dot 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse-dot {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .menu-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1px solid var(--line);
+    background: rgba(255,255,255,0.04);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--fg-dim);
+  }
+
+  /* MAIN */
+  main {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 24px;
+  }
+
+  .counter-card {
+    text-align: center;
+    max-width: 760px;
+    width: 100%;
+  }
+
+  .asterisk {
+    width: 38px;
+    height: 38px;
+    color: var(--accent);
+    margin: 0 auto 28px;
+    filter: drop-shadow(0 0 12px var(--accent-glow));
+    animation: spin-slow 24s linear infinite;
+  }
+
+  @keyframes spin-slow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  .label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--fg-dim);
+    margin-bottom: 28px;
+  }
+
+  .label .sep {
+    color: var(--accent);
+    margin: 0 8px;
+  }
+
+  .pool-amount {
+    font-family: 'Newsreader', 'Times New Roman', serif;
+    font-size: clamp(72px, 14vw, 184px);
+    font-weight: 500;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    color: var(--fg);
+    margin-bottom: 26px;
+    font-variant-numeric: tabular-nums;
+    transition: transform 0.18s ease-out;
+    text-shadow: 0 0 60px rgba(245, 244, 239, 0.04);
+  }
+
+  .pool-amount.flicker {
+    transform: scale(1.005);
+  }
+
+  .pool-amount .currency {
+    font-size: 0.55em;
+    vertical-align: top;
+    margin-right: 2px;
+    color: var(--fg-dim);
+    font-weight: 400;
+  }
+
+  .spent-line {
+    font-size: 13px;
+    color: var(--fg-dim);
+    letter-spacing: 0.02em;
+  }
+
+  .spent-line .amount {
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
+    font-weight: 500;
+  }
+
+  .spent-line .live {
+    display: inline-block;
+    margin-left: 10px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: rgba(217, 119, 87, 0.12);
+    border: 1px solid rgba(217, 119, 87, 0.3);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+
+  /* FOOTER STATS */
+  footer {
+    display: flex;
+    justify-content: center;
+    gap: 64px;
+    padding: 24px 36px 36px;
+    border-top: 1px solid var(--line);
+  }
+
+  .stat {
+    text-align: center;
+  }
+
+  .stat-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--fg-dim);
+    margin-bottom: 6px;
+  }
+
+  .stat-value {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--fg);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .stat-value .delta {
+    font-size: 11px;
+    color: var(--accent);
+    margin-left: 6px;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 640px) {
+    header { padding: 16px 20px; }
+    .nav-right { gap: 12px; font-size: 11px; }
+    .brand-by { display: none; }
+    footer { gap: 24px; padding: 18px 16px 24px; flex-wrap: wrap; }
+    .stat-value { font-size: 13px; }
+  }
+</style>
+</head>
+<body>
+  <header>
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M12 0 L13.8 9.4 L22 4.4 L17 12.6 L24 14.4 L14.6 16.2 L19.6 24 L12 19 L4.4 24 L9.4 16.2 L0 14.4 L7 12.6 L2 4.4 L10.2 9.4 Z"/>
+      </svg>
+      <span class="brand-text">Claude<span class="brand-by">by Anthropic</span></span>
+    </div>
+    <div class="nav-right">
+      <span class="status-dot">Live</span>
+      <span>API</span>
+      <span>Docs</span>
+      <button class="menu-btn" aria-label="menu">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <div class="counter-card">
+      <svg class="asterisk" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M12 0 L13.8 9.4 L22 4.4 L17 12.6 L24 14.4 L14.6 16.2 L19.6 24 L12 19 L4.4 24 L9.4 16.2 L0 14.4 L7 12.6 L2 4.4 L10.2 9.4 Z"/>
+      </svg>
+      <div class="label">
+        Global Credit Pool<span class="sep">&middot;</span>Remaining
+      </div>
+      <div class="pool-amount" id="poolAmount">
+        <span class="currency">$</span><span id="poolValue">58,793</span>
+      </div>
+      <div class="spent-line">
+        <span class="amount" id="spentValue">$0.00</span> spent across the network today
+        <span class="live">Live</span>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <div class="stat">
+      <div class="stat-label">Burn Rate</div>
+      <div class="stat-value"><span id="burnRate">0.00</span>/s</div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Active Sessions</div>
+      <div class="stat-value"><span id="sessions">0</span><span class="delta" id="sessionsDelta">+0</span></div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Tokens / Min</div>
+      <div class="stat-value"><span id="tpm">0</span></div>
+    </div>
+    <div class="stat">
+      <div class="stat-label">Models Online</div>
+      <div class="stat-value">3<span class="delta">all</span></div>
+    </div>
+  </footer>
+
+<script>
+  // FAKE COUNTER ENGINE
+  // Pool starts near screenshot value and decreases ("spent" rises symmetrically).
+  // Updates: small frequent decrements + occasional larger jumps to feel alive.
+
+  const state = {
+    pool: 58793.42,
+    spentToday: 0,
+    sessions: 142,
+    sessionsLast: 142,
+  };
+
+  const el = {
+    poolValue: document.getElementById('poolValue'),
+    poolAmount: document.getElementById('poolAmount'),
+    spentValue: document.getElementById('spentValue'),
+    burnRate: document.getElementById('burnRate'),
+    sessions: document.getElementById('sessions'),
+    sessionsDelta: document.getElementById('sessionsDelta'),
+    tpm: document.getElementById('tpm'),
+  };
+
+  function fmt(n, decimals) {
+    return n.toLocaleString('en-US', {
+      minimumFractionDigits: decimals,
+      maximumFractionDigits: decimals,
+    });
+  }
+
+  function rand(min, max) {
+    return Math.random() * (max - min) + min;
+  }
+
+  // BURN RATE TARGET: ~$1-3 per second average, with bursts up to $20
+  let burnPerSec = 1.8;
+  let burstCooldown = 0;
+
+  function tick(dt) {
+    // dt in seconds
+    if (burstCooldown > 0) {
+      burstCooldown -= dt;
+    } else if (Math.random() < 0.04) {
+      // ~4% chance per tick to start a burst (large transaction)
+      burnPerSec = rand(8, 22);
+      burstCooldown = rand(0.8, 2.4);
+    } else {
+      // gentle drift
+      burnPerSec += rand(-0.4, 0.4);
+      burnPerSec = Math.max(0.4, Math.min(burnPerSec, 6));
+    }
+
+    const delta = burnPerSec * dt;
+    state.pool -= delta;
+    state.spentToday += delta;
+
+    // sessions drift
+    if (Math.random() < 0.18) {
+      const change = Math.round(rand(-3, 6));
+      state.sessions = Math.max(80, state.sessions + change);
+    }
+
+    // floor: don't drop below 0
+    if (state.pool < 0) state.pool = 0;
+  }
+
+  function render() {
+    // pool: integer display when >= 100, else 2 decimals (matches screenshot style)
+    const poolStr = state.pool >= 1000
+      ? Math.round(state.pool).toLocaleString('en-US')
+      : fmt(state.pool, 2);
+    el.poolValue.textContent = poolStr;
+
+    el.spentValue.textContent = '$' + fmt(state.spentToday, 2);
+    el.burnRate.textContent = '$' + fmt(burnPerSec, 2);
+
+    el.sessions.textContent = state.sessions.toLocaleString('en-US');
+    const sd = state.sessions - state.sessionsLast;
+    if (sd !== 0) {
+      el.sessionsDelta.textContent = (sd > 0 ? '+' : '') + sd;
+      el.sessionsDelta.style.color = sd > 0 ? 'var(--accent)' : '#ef4444';
+    }
+
+    // tokens per minute synthetic: burnRate * 600-1400
+    el.tpm.textContent = Math.round(burnPerSec * rand(620, 1280)).toLocaleString('en-US');
+
+    // micro flicker animation
+    el.poolAmount.classList.add('flicker');
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => el.poolAmount.classList.remove('flicker'));
+    });
+  }
+
+  // commit sessions baseline every 10s for delta display
+  setInterval(() => { state.sessionsLast = state.sessions; }, 10000);
+
+  // initial render
+  render();
+
+  let lastT = performance.now();
+  function loop() {
+    const now = performance.now();
+    const dt = (now - lastT) / 1000;
+    lastT = now;
+    tick(dt);
+    render();
+    // schedule next tick at 80-260ms for "live" feel
+    setTimeout(loop, 80 + Math.random() * 180);
+  }
+  setTimeout(loop, 250);
+</script>
+</body>
+</html>
